@@ -1,0 +1,10 @@
+.point {
+    width: var(--point-size);
+    height: var(--point-size);
+    background: var(--point-color);
+    border-radius: 50%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(var(--point-offset), var(--point-offset));
+}

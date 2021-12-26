@@ -1,0 +1,11 @@
+:root {
+    --field-line-color: #bbb;
+    --field-width-in-cells: 30;
+    --field-height-in-cells: 30;
+
+    --cell-size: 30px;
+
+    --point-color: blue;
+    --point-size: 11px;
+    --point-offset: calc(-1 * var(--point-size) / 2 - 1px);
+}

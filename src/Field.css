@@ -1,0 +1,11 @@
+.field {
+    background: linear-gradient(var(--field-line-color), transparent 1px), linear-gradient(90deg, var(--field-line-color), transparent 1px);
+    background-size: var(--cell-size) var(--cell-size);
+    background-position: -1px -1px;
+    width: calc(var(--field-width-in-cells) * var(--cell-size) - 1px);
+    height: calc(var(--field-height-in-cells) * var(--cell-size) - 1px);
+    border: 1px solid var(--field-line-color);
+    margin: 20px;
+    position: relative;
+}
+
