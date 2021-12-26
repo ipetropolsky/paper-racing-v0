@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { CELL_SIZE, MAGNET_DISTANCE } from './constants';
+import { CELL_SIZE, FIELD_WIDTH_IN_CELLS, FIELD_HEIGHT_IN_CELLS } from './constants';
 import Point from './Point';
+import { log } from './debug';
 
 import './Field.css';
 
@@ -21,10 +22,15 @@ const defaultPointPosition = {
     top: 0,
 };
 
+const fieldStyle = {
+    width: FIELD_WIDTH_IN_CELLS * CELL_SIZE - 1,
+    height: FIELD_HEIGHT_IN_CELLS * CELL_SIZE - 1,
+};
+
 const Field = () => {
     const fieldRef = useRef();
     const [fieldMetrics, setFieldMetrics] = useState(defaultBoundingClientRect);
-    const [pointMetrics, setPointMetrics] = useState(defaultPointPosition);
+    const [pointPosition, setPointPosition] = useState(defaultPointPosition);
     useEffect(() => {
         const resizeHandler = () => {
             if (fieldRef.current) {
@@ -47,22 +53,18 @@ const Field = () => {
 
     const onMouseMove = useCallback(
         ({ pageX, pageY }) => {
-            const x = pageX - fieldMetrics.left;
-            const y = pageY - fieldMetrics.top;
-            const left = Math.round(x / CELL_SIZE);
-            const top = Math.round(y / CELL_SIZE);
-            const dx = x - left * CELL_SIZE;
-            const dy = y - top * CELL_SIZE;
-            const isMagnetic = Math.sqrt(dx * dx + dy * dy) <= MAGNET_DISTANCE;
-            isMagnetic && setPointMetrics({ left, top });
+            const left = Math.floor((pageX - fieldMetrics.left) / CELL_SIZE);
+            const top = Math.floor((pageY - fieldMetrics.top) / CELL_SIZE);
+            log('Move point to', { left, top });
+            setPointPosition({ left, top });
         },
         [fieldMetrics]
     );
 
     return (
-        <div style={{ position: 'relative', margin: 10 }}>
-            <div className="field" ref={fieldRef} onMouseMove={onMouseMove}>
-                <Point left={pointMetrics.left} top={pointMetrics.top} />
+        <div style={{ position: 'relative', margin: 30 }}>
+            <div className="field" ref={fieldRef} onMouseMove={onMouseMove} style={fieldStyle}>
+                <Point left={pointPosition.left} top={pointPosition.top} />
             </div>
         </div>
     );
