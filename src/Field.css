@@ -4,5 +4,6 @@
     background-position: var(--border-width-negative) var(--border-width-negative);
     border: 1px solid var(--field-line-color);
     position: relative;
+    z-index: 1;
+    cursor: pointer;
 }
-

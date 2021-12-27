@@ -1,0 +1,6 @@
+.car {
+    width: calc(var(--cell-size) - 2px);
+    height: calc(var(--cell-size) - 2px);
+    position: absolute;
+    z-index: 100;
+}

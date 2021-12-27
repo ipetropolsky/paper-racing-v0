@@ -1,8 +1,13 @@
 :root {
     --field-line-color: #bbb;
     --cell-size: 30px;
+    --cell-size-negative: calc(-1 * var(--cell-size));
     --border-width: 1px;
     --border-width-negative: calc(-1 * var(--border-width));
-    --point-size: calc(var(--cell-size) - var(--border-width));
+    /*--point-size: calc(var(--cell-size) - var(--border-width));*/
+    --point-size: 20px;
     --point-color: #eee;
+    --point-offset: calc((var(--cell-size) - var(--point-size)) / 2);
+    --path-dot-radius: 5px;
+    --path-line-width: 3px;
 }

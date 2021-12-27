@@ -1,0 +1,18 @@
+.next-move {
+    position: absolute;
+    left: 100%;
+    top: 100%;
+    width: calc(3 * var(--cell-size) - var(--border-width));
+    height: calc(3 * var(--cell-size) - var(--border-width));
+    transform: translate(var(--cell-size-negative), var(--cell-size-negative));
+    background: repeating-radial-gradient(
+        circle,
+        #ddd,
+        #ddd 10px,
+        transparent 10px,
+        transparent 23px
+    );
+    opacity: 0.3;
+    z-index: 30;
+    pointer-events: none;
+}
