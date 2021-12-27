@@ -8,14 +8,15 @@ export const getSafeCell = (left, top) => ({
 
 export const getCellByCoords = (x, y) => getSafeCell(Math.floor(x / CELL_SIZE), Math.floor(y / CELL_SIZE));
 
-export const calculateTrack = (from, to) => {
-    const dx = to.left - from.left;
-    const dy = to.top - from.top;
+export const calculateTrack = (current, next) => {
+    const dx = next.left - current.left;
+    const dy = next.top - current.top;
     const speed = Math.max(Math.abs(dx), Math.abs(dy));
     const exactSpeed = Math.sqrt(dx * dx + dy * dy);
     const vector = { dx, dy };
     const angle = Math.atan(dy / dx) + (dx < 0 ? Math.PI : 0);
     return {
+        position: next,
         vector,
         angle,
         speed,

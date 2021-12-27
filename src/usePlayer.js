@@ -8,84 +8,132 @@ import { calculateTrack } from './utils';
 import Point from './Point';
 import NextMove from './NextMove';
 
-const START = 'START';
 const MOVE = 'MOVE';
+const UNDO = 'UNDO';
+const REDO = 'REDO';
 
 const initialState = {
-    start: defaultPosition,
-    position: defaultPosition,
-    vector: { dx: 0, dy: 0 },
-    speed: 0,
-    exactSpeed: 0,
+    current: {
+        position: defaultPosition,
+        vector: { dx: 0, dy: 0 },
+        angle: Math.PI / 4,
+        speed: 0,
+        exactSpeed: 0,
+    },
     history: [],
+    future: [],
     track: [],
 };
 
-const startAction = ({ left, top }) => ({ type: START, payload: { left, top } });
 const moveAction = ({ left, top }) => ({ type: MOVE, payload: { left, top } });
-
-const makeStartState = (state, action) => {
-    const { left, top } = action.payload;
-    log('Start at ', { left, top });
-    return { ...state, error: null, start: { left, top }, position: { left, top } };
-};
+const undoAction = () => ({ type: UNDO });
+const redoAction = (dispatch) => ({ type: REDO, payload: { dispatch } });
 
 const makeMoveState = (state, action) => {
     const { left, top } = action.payload;
-    const { position: lastPosition, vector: lastVector } = state;
-    const position = { left, top };
-    const { vector, angle, speed, exactSpeed } = calculateTrack(lastPosition, position);
-    if (Math.abs(vector.dx - lastVector.dx) > 1 || Math.abs(vector.dy - lastVector.dy) > 1) {
-        log('Error at ', position, 'from', lastPosition);
-        return { ...state, error: position };
+    const { current } = state;
+    const next = calculateTrack(current.position, { left, top });
+    log('Move', next, 'from', current);
+    if (Math.abs(next.vector.dx - current.vector.dx) > 1 || Math.abs(next.vector.dy - current.vector.dy) > 1) {
+        return { ...state, error: { ...next.position } };
     }
-    log('Move to', position, 'from', lastPosition, { vector, angle, speed, exactSpeed });
     return {
         ...state,
         error: null,
-        position,
-        vector,
-        angle,
-        speed,
-        exactSpeed,
+        current: next,
         history: state.history.concat(action),
+        future: action.doNotClearFuture ? state.future : [],
         track: state.track.concat({
-            from: lastPosition,
-            to: position,
-            vector,
-            angle,
-            speed,
-            exactSpeed,
+            from: current,
+            to: next,
         }),
     };
 };
 
+const makeUndoState = (state) => {
+    if (state.history.length) {
+        const lastAction = state.history[state.history.length - 1];
+        log('Undo', lastAction);
+        if (lastAction.type === MOVE) {
+            const { from } = state.track[state.track.length - 1];
+            return {
+                ...state,
+                error: null,
+                current: { ...from },
+                history: state.history.slice(0, state.history.length - 1),
+                future: [lastAction, ...state.future],
+                track: state.track.slice(0, state.track.length - 1),
+            };
+        }
+    }
+    return state;
+};
+
+const makeRedoState = (state, action) => {
+    if (state.future.length) {
+        const { dispatch } = action.payload;
+        const nextAction = state.future[0];
+        log('Redo', nextAction);
+        dispatch({ ...nextAction, doNotClearFuture: true });
+        return {
+            ...state,
+            future: state.future.slice(1),
+        };
+    }
+};
+
 function reducer(state, action) {
     switch (action.type) {
-        case START:
-            return makeStartState(state, action);
         case MOVE:
             return makeMoveState(state, action);
+        case UNDO:
+            return makeUndoState(state, action);
+        case REDO:
+            return makeRedoState(state, action);
     }
 }
 
 const usePlayer = (color) => {
-    const [{ error, position, vector, track, angle, exactSpeed }, dispatch] = useReducer(reducer, initialState);
-    const moveTo = useCallback((nextPosition) => {
+    const [{ error, current, track, future }, dispatch] = useReducer(reducer, initialState);
+
+    const moveTo = (nextPosition) => {
         dispatch(moveAction(nextPosition));
-    }, []);
+    };
+
+    const undo = () => {
+        dispatch(undoAction());
+    };
+
+    const redo = () => {
+        dispatch(redoAction(dispatch));
+    };
+
     const render = () => (
         <>
-            {position && <Car left={position.left} top={position.top} angle={angle} color={color} />}
-            {track.map(({ from, angle, exactSpeed }) => {
-                return <Path from={from} angle={angle} exactSpeed={exactSpeed} color={color} />;
+            {current.position && (
+                <Car left={current.position.left} top={current.position.top} angle={current.angle} color={color} />
+            )}
+            {track.map(({ from, to }, index) => {
+                return (
+                    <Path
+                        key={index}
+                        position={from.position}
+                        angle={to.angle}
+                        exactSpeed={to.exactSpeed}
+                        color={color}
+                    />
+                );
             })}
-            <Path from={position} angle={angle} exactSpeed={exactSpeed} color="#eee" last />
+            <Path position={current.position} angle={current.angle} exactSpeed={current.exactSpeed} color="#eee" last />
             {error && <Point left={error.left} top={error.top} color="red" />}
-            <NextMove left={position.left + vector.dx} top={position.top + vector.dy} color="purple" />
+            <NextMove
+                left={current.position.left + current.vector.dx}
+                top={current.position.top + current.vector.dy}
+                color="purple"
+            />
         </>
     );
-    return [moveTo, render];
+    return [moveTo, render, undo, redo];
 };
 
 export default usePlayer;

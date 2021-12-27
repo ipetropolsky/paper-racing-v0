@@ -16,8 +16,17 @@ const Field = () => {
     const fieldRef = useRef();
     const [fieldMetrics, setFieldMetrics] = useState(defaultRect);
     const [cursor, setCursor] = useState(null);
-    const [movePlayer1, renderPlayer1] = usePlayer('#4d4dff');
+    const [movePlayer1, renderPlayer1, undoPlayer1, redoPlayer1] = usePlayer('#4d4dff');
     useEffect(() => {
+        const keyDownHandler = (event) => {
+            if (event.keyCode == 90 && (event.ctrlKey || event.metaKey)) {
+                if (event.shiftKey) {
+                    redoPlayer1();
+                } else {
+                    undoPlayer1();
+                }
+            }
+        };
         const resizeHandler = () => {
             if (fieldRef.current) {
                 const newMetrics = fieldRef.current.getBoundingClientRect();
@@ -29,10 +38,12 @@ const Field = () => {
                 );
             }
         };
+        document.addEventListener('keydown', keyDownHandler);
         window.addEventListener('resize', resizeHandler);
         resizeHandler();
 
         return () => {
+            document.removeEventListener('keydown', keyDownHandler);
             window.removeEventListener('resize', resizeHandler);
         };
     }, []);
