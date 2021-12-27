@@ -16,7 +16,7 @@ const Field = () => {
     const fieldRef = useRef();
     const [fieldMetrics, setFieldMetrics] = useState(defaultRect);
     const [cursor, setCursor] = useState(null);
-    const [movePlayer1, renderPlayer1, undoPlayer1, redoPlayer1] = usePlayer('#4d4dff');
+    const [movePlayer1, renderPlayer1, undoPlayer1, redoPlayer1, resetPlayer1] = usePlayer('#4d4dff');
     useEffect(() => {
         const keyDownHandler = (event) => {
             if (event.keyCode == 90 && (event.ctrlKey || event.metaKey)) {
@@ -25,6 +25,9 @@ const Field = () => {
                 } else {
                     undoPlayer1();
                 }
+            } else if (event.keyCode == 32) {
+                resetPlayer1();
+                event.preventDefault();
             }
         };
         const resizeHandler = () => {
@@ -69,7 +72,7 @@ const Field = () => {
             <div className="field" ref={fieldRef} onMouseMove={onMouseMove} onClick={onClick} style={fieldStyle}>
                 {cursor && <Point left={cursor.left} top={cursor.top} color="#ddd" />}
                 {goals.map(({ id, left, top }) => (
-                    <Point key={id} left={left} top={top} color="green" />
+                    <Point key={id} left={left} top={top} color="gold" />
                 ))}
             </div>
             {renderPlayer1()}

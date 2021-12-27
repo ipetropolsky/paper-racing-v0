@@ -1,6 +1,6 @@
 import { useReducer } from 'react';
 
-import { defaultPosition } from './constants';
+import { CELL_SIZE, defaultPosition, FIELD_WIDTH_IN_CELLS } from './constants';
 import { log } from './debug';
 import Path from './Path';
 import Car from './Car';
@@ -11,6 +11,7 @@ import NextMove from './NextMove';
 const MOVE = 'MOVE';
 const UNDO = 'UNDO';
 const REDO = 'REDO';
+const RESET = 'RESET';
 
 const initialState = {
     current: {
@@ -20,6 +21,7 @@ const initialState = {
         speed: 0,
         exactSpeed: 0,
     },
+    error: null,
     history: [],
     future: [],
     track: [],
@@ -28,6 +30,7 @@ const initialState = {
 const moveAction = ({ left, top }) => ({ type: MOVE, payload: { left, top } });
 const undoAction = () => ({ type: UNDO });
 const redoAction = (dispatch) => ({ type: REDO, payload: { dispatch } });
+const resetAction = () => ({ type: RESET });
 
 const makeMoveState = (state, action) => {
     const { left, top } = action.payload;
@@ -80,6 +83,11 @@ const makeRedoState = (state, action) => {
             future: state.future.slice(1),
         };
     }
+    return state;
+};
+
+const makeResetState = () => {
+    return { ...initialState };
 };
 
 function reducer(state, action) {
@@ -90,7 +98,10 @@ function reducer(state, action) {
             return makeUndoState(state, action);
         case REDO:
             return makeRedoState(state, action);
+        case RESET:
+            return makeResetState(state, action);
     }
+    return state;
 }
 
 const usePlayer = (color) => {
@@ -107,6 +118,13 @@ const usePlayer = (color) => {
     const redo = () => {
         dispatch(redoAction(dispatch));
     };
+
+    const reset = () => {
+        dispatch(resetAction());
+    };
+
+    const distance = track.length ? track.reduce((result, { to: { exactSpeed } }) => result + exactSpeed, 0) : 0;
+    const averageSpeed = track.length ? distance / track.length : 0;
 
     const render = () => (
         <>
@@ -131,9 +149,15 @@ const usePlayer = (color) => {
                 top={current.position.top + current.vector.dy}
                 color="purple"
             />
+            <div className="score" style={{ left: FIELD_WIDTH_IN_CELLS * CELL_SIZE }}>
+                <p>Ходы: {track.length}</p>
+                <p>Скорость: {Math.round(current.exactSpeed * 100) / 100}</p>
+                <p>Средняя скорость: {Math.round(averageSpeed * 100) / 100}</p>
+                <p>Дистанция: {Math.round(distance * 100) / 100}</p>
+            </div>
         </>
     );
-    return [moveTo, render, undo, redo];
+    return [moveTo, render, undo, redo, reset];
 };
 
 export default usePlayer;

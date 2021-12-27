@@ -7,3 +7,17 @@
     z-index: 1;
     cursor: pointer;
 }
+
+.score {
+    font-size: 36px;
+    font-family: 'PT Sans Narrow';
+    font-weight: bold;
+    position: absolute;
+    margin-left: 40px;
+    top: 20px;
+    pointer-events: none;
+}
+
+.score p {
+    margin: 0 0 10px 0;
+}
