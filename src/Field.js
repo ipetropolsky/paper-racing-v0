@@ -68,8 +68,8 @@ const Field = () => {
         <div style={{ position: 'relative', margin: 30 }}>
             <div className="field" ref={fieldRef} onMouseMove={onMouseMove} onClick={onClick} style={fieldStyle}>
                 {cursor && <Point left={cursor.left} top={cursor.top} color="#ddd" />}
-                {renderPlayer1()}
             </div>
+            {renderPlayer1()}
         </div>
     );
 };

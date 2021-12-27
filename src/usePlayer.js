@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from 'react';
+import { useReducer } from 'react';
 
 import { defaultPosition } from './constants';
 import { log } from './debug';
