@@ -3,6 +3,7 @@
     position: absolute;
     transform-origin: top left;
     z-index: 20;
+    pointer-events: none;
 }
 
 .path_last {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { CELL_SIZE, FIELD_WIDTH_IN_CELLS, FIELD_HEIGHT_IN_CELLS, defaultRect, defaultPosition } from './constants';
+import { CELL_SIZE, FIELD_WIDTH_IN_CELLS, FIELD_HEIGHT_IN_CELLS, defaultRect, goals } from './constants';
 import Point from './Point';
 import { getCellByCoords } from './utils';
 
@@ -68,6 +68,9 @@ const Field = () => {
         <div style={{ position: 'relative', margin: 30 }}>
             <div className="field" ref={fieldRef} onMouseMove={onMouseMove} onClick={onClick} style={fieldStyle}>
                 {cursor && <Point left={cursor.left} top={cursor.top} color="#ddd" />}
+                {goals.map(({ id, left, top }) => (
+                    <Point key={id} left={left} top={top} color="green" />
+                ))}
             </div>
             {renderPlayer1()}
         </div>

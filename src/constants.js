@@ -19,3 +19,8 @@ export const defaultPosition = {
     left: 0,
     top: 0,
 };
+
+export const goals = [];
+for (let i = 0; i < 5; i++) {
+    goals.push({ id: String(i), left: Math.floor(Math.random() * 30), top: Math.floor(Math.random() * 30) });
+}

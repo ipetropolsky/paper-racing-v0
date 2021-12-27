@@ -94,7 +94,7 @@ function reducer(state, action) {
 }
 
 const usePlayer = (color) => {
-    const [{ error, current, track, future }, dispatch] = useReducer(reducer, initialState);
+    const [{ error, current, track }, dispatch] = useReducer(reducer, initialState);
 
     const moveTo = (nextPosition) => {
         dispatch(moveAction(nextPosition));
